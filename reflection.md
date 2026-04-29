@@ -1,23 +1,23 @@
-# Reflection Notes
+# Reflection Notes: Applied AI System
 
-## Profile Output Comparisons
+## Biggest Learning Moment
 
-### High-Energy Pop vs Chill Lofi
+The biggest learning moment was that reliability is not one feature, it is a stack of small mechanisms. Guardrails, retrieval grounding, visible planning steps, and confidence scoring together made the system feel far more trustworthy than scoring alone.
 
-High-Energy Pop favored high valence and high danceability tracks with faster tempos. Chill Lofi shifted strongly toward low-energy and high-acousticness songs. This makes sense because energy and acousticness targets are almost opposite.
+## Helpful AI Suggestion
 
-### Chill Lofi vs Deep Intense Rock
+AI helped by proposing a modular separation between recommender, retrieval, and orchestration. That made it easier to build a clear architecture diagram and write focused tests.
 
-Chill Lofi preferred calm songs with lower tempo and softer attributes. Deep Intense Rock moved toward high-energy/high-tempo tracks with intense mood. The output split is expected because both profile genre and numeric targets are far apart.
+## Flawed AI Suggestion
 
-### Deep Intense Rock vs Adversarial: Sad but High Energy
+AI suggested an isolated retrieval demo script. That would have failed rubric integration criteria because retrieval was not altering final system behavior. I corrected this by routing retrieval output directly into agent responses and confidence computation.
 
-Deep Intense Rock tends to surface aggressive rock/metal-like songs. The adversarial profile produces unusual mixes because it asks for high energy but low valence/sad mood, which can push dark high-BPM tracks above upbeat songs.
+## What Surprised Me in Testing
 
-## What Changed in the Weight-Shift Experiment
+Two prompts with similar intent can produce different retrieval quality due to wording. The lexical retriever is transparent but brittle, which surfaced the need for semantic retrieval in future iterations.
 
-When energy weight was doubled and genre weight halved, songs closer in energy jumped higher even without a genre match. This improved cross-genre flexibility but reduced genre purity.
+## Future Extension Ideas
 
-## One Clear Limitation
-
-The model can over-prioritize whichever feature has the highest weight. If genre is overweighted, it risks a filter bubble where songs from other genres are rarely explored, even if their vibe is a better overall fit.
+1. Add embedding-based retrieval and compare quality against lexical baseline.
+2. Add multi-objective ranking that balances preference match and novelty.
+3. Add a simple web UI for better user testing and human rating collection.

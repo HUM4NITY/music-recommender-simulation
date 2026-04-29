@@ -1,80 +1,105 @@
-# Model Card: VibeFinder 1.0
+# Model Card: VibePilot 2.0 Applied AI System
 
 ## Model Name
 
-VibeFinder 1.0
+VibePilot 2.0
 
-## Goal / Task
+## Goal and Task
 
-Recommend songs that best match a user's taste profile using song attributes and weighted scoring.
+Provide explainable music recommendations from a local catalog while using retrieval context and an agentic decision chain to increase transparency and reliability.
 
 ## Data Used
 
-- Source: `data/songs.csv`
-- Size: 20 songs
-- Attributes:
-  - Categorical: genre, mood
-  - Numeric: energy, tempo_bpm, danceability, acousticness, valence
-- Limits:
-  - Small dataset
-  - Label quality depends on manual curation
-  - Not behavior-based (no likes/skips/play counts)
+- Core catalog: data/songs.csv (20 songs)
+- Retrieval sources:
+  - knowledge/genre_guides.md
+  - knowledge/safety_and_bias.md
+  - generated song snippets from songs.csv
+- Features:
+  - categorical: genre, mood
+  - numeric: energy, tempo_bpm, danceability, acousticness, valence
 
-## Algorithm Summary
+## Algorithm and System Summary
 
-The system compares each song to a user profile.
-
-- It gives points for exact matches (genre and mood).
-- It gives partial points for closeness on numeric features (energy, tempo, etc.).
-- Every song gets a final score.
-- Songs are sorted from highest to lowest score.
-- Top-k songs are shown with short reasons.
-
-This is content-based ranking, not collaborative filtering.
-
-## Observed Behavior / Biases
-
-- When genre weight is large, recommendations cluster in one genre.
-- Small catalogs can repeatedly surface the same songs.
-- Exact mood matching can be rigid and miss close emotional alternatives.
-- Some genres appear less often in data, which reduces their visibility.
-
-## Evaluation Process
-
-Profiles tested:
-
-1. High-Energy Pop
-2. Chill Lofi
-3. Deep Intense Rock
-4. Adversarial: Sad but High Energy
-
-Evaluation steps:
-
-- Ran `python -m src.main` for all profiles.
-- Compared top 5 outputs per profile.
-- Ran sensitivity experiment:
-  - doubled energy weight
-  - halved genre weight
-- Observed how top-ranked songs changed.
+1. Guardrail validation checks query quality and unsafe content.
+2. Agent planning step maps query intent to a profile.
+3. RAG retriever fetches top context chunks from multi-source local knowledge.
+4. Recommender computes weighted scores and ranks songs.
+5. Self-check computes confidence from recommendation strength and retrieval relevance.
+6. Response composer outputs specialized tone and visible reasoning steps.
 
 ## Intended Use
 
-- Learning/demo project for recommendation basics
-- Explainable ranking in small song catalogs
-- Classroom experiments with scoring weights
+- Educational demonstration of applied AI system design
+- Explainable recommendation workflows
+- Small-scale prototyping with transparent decision logic
 
 ## Non-Intended Use
 
-- Real production personalization at scale
-- Sensitive decision-making
-- Any high-stakes recommendation context
+- High-stakes decisions (medical, legal, hiring, finance)
+- Large-scale production personalization
+- Safety-critical automation without human review
 
-## Ideas for Improvement
+## Reliability and Guardrails
 
-1. Add hybrid logic (content + collaborative signals)
-2. Add novelty/diversity constraints directly in ranking
-3. Learn weights from feedback instead of fixed manual values
+- Input guardrails:
+  - block unsafe terms
+  - block underspecified queries
+- Confidence score per response
+- Automated evaluation harness (eval/evaluation.py)
+- Unit tests for both recommender and applied agent behavior
 
-## Personal Reflection
+## Evaluation Summary
 
-The biggest learning moment was seeing that small changes to weights can completely change recommendations. AI tools helped me move faster when drafting scoring logic and profile ideas, but I had to manually verify that math and reasoning matched my intent. What surprised me most is that even a simple weighted algorithm can feel "smart" when explanations are clear. If I continue this project, I would add user feedback loops and compare a content-based model against a collaborative baseline.
+Evaluation script tests:
+
+1. workout-style query should pass with minimum confidence
+2. focus-style query should pass with minimum confidence
+3. unsafe/too-short query should be blocked
+
+Recent evaluation summary target:
+
+- passed=3/3
+
+## Observed Behavior, Limitations, and Biases
+
+- Small dataset increases repetition risk.
+- Rule-based profile selection can misclassify nuanced prompts.
+- Lexical retrieval can miss semantic matches with different wording.
+- Genre/mood labels are subjective and can encode simplifications.
+- Confidence score is heuristic, not calibrated probability.
+
+## Potential Misuse and Mitigations
+
+Potential misuse:
+
+- Treating recommendations as objective truth.
+- Using outputs without context in sensitive settings.
+
+Mitigations:
+
+- explicit intended/non-intended use
+- visible reasons and step trace
+- confidence display
+- guardrail rejection path
+
+## AI Collaboration Reflection
+
+Helpful AI suggestion:
+
+- AI suggested separating retrieval logic into its own module. This improved modularity and made evaluation easier because retrieval behavior is now testable in isolation.
+
+Flawed AI suggestion:
+
+- AI initially suggested only running a standalone retrieval demo script. That would not satisfy integration requirements, so the design was revised to ensure retrieval directly influences final recommendations and confidence.
+
+## What Surprised Me in Reliability Testing
+
+Even with deterministic scoring, output trust improves significantly when users can see intermediate steps and confidence. The guardrail layer caught short unsafe prompts that would otherwise generate noisy outputs.
+
+## Future Improvements
+
+1. Replace lexical retrieval with semantic embeddings for better context recall.
+2. Add profile learning from user feedback.
+3. Calibrate confidence against human-labeled benchmarks.
+4. Expand catalog and add fairness-aware diversity constraints.
