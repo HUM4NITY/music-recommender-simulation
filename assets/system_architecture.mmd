@@ -1,0 +1,17 @@
+flowchart TD
+    A[User Query] --> B[AppliedMusicAgent]
+    B --> C[Guardrail Validation]
+    C -->|valid| D[Intent and Profile Planner]
+    C -->|blocked| E[Safe Rejection Response]
+    D --> F[KnowledgeRetriever]
+    F --> G[(knowledge/*.md + songs.csv snippets)]
+    D --> H[Recommender Engine]
+    H --> I[Ranked Songs with Reasons]
+    F --> J[Retrieved Context]
+    I --> K[Self-Check and Confidence]
+    J --> K
+    K --> L[Specialized Response Composer]
+    L --> M[CLI Output]
+    M --> N[Human Review]
+    O[Evaluation Harness eval/evaluation.py] --> B
+    O --> P[Test Summary Pass/Fail]
